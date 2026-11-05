@@ -93,14 +93,26 @@ export class KeyboardInputManager {
     // Respond to swipe events
     let touchStartClientX = 0;
     let touchStartClientY = 0;
+    let isTrackingSwipe = false;
     const gameContainer = document.querySelector('.game-container');
 
     if (gameContainer) {
       const touchstartHandler = (event) => {
+        // If touching inside overlay message or on an interactive element, do not intercept
+        if (
+          (event.target.closest && event.target.closest('.game-message')) ||
+          (event.target.closest && event.target.closest('button, a'))
+        ) {
+          isTrackingSwipe = false;
+          return;
+        }
+
         if (event.touches.length > 1 || (event.targetTouches && event.targetTouches.length > 1)) {
+          isTrackingSwipe = false;
           return; // Ignore if touching with more than 1 finger
         }
 
+        isTrackingSwipe = true;
         touchStartClientX = event.touches[0].clientX;
         touchStartClientY = event.touches[0].clientY;
 
@@ -108,10 +120,14 @@ export class KeyboardInputManager {
       };
 
       const touchmoveHandler = (event) => {
+        if (!isTrackingSwipe) return;
         event.preventDefault();
       };
 
       const touchendHandler = (event) => {
+        if (!isTrackingSwipe) return;
+        isTrackingSwipe = false;
+
         if (event.touches.length > 0 || (event.targetTouches && event.targetTouches.length > 0)) {
           return; // Ignore if still touching with one or more fingers
         }

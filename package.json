@@ -1,9 +1,12 @@
 {
   "name": "2048",
   "version": "2.0.0",
-  "description": "A modernized, lightweight edition of the classic 2048 game using native ES Modules, Vite, and Vitest.",
+  "description": "A modernized, lightweight edition of the classic 2048 game using native ES Modules, Vite 8, and Vitest.",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +15,7 @@
   },
   "devDependencies": {
     "happy-dom": "^21.0.4",
-    "vite": "^8.3.5",
+    "vite": "^8.3.6",
     "vitest": "^5.1.0"
   }
 }

@@ -28,6 +28,7 @@ export class GameManager {
   keepPlaying() {
     this.keepPlayingState = true;
     this.actuator.continueGame(); // Clear the game won/lost message
+    this.actuate(); // Immediately persist the continued state
   }
 
   // Return true if the game is lost, or has won and the user hasn't kept playing
@@ -35,12 +36,40 @@ export class GameManager {
     return this.over || (this.won && !this.keepPlayingState);
   }
 
+  // Validate saved game structure from localStorage to prevent crashes from corrupted data
+  isValidGameState(state) {
+    if (!state || typeof state !== 'object') return false;
+    if (typeof state.score !== 'number' || Number.isNaN(state.score) || state.score < 0) return false;
+    if (typeof state.over !== 'boolean') return false;
+    if (typeof state.won !== 'boolean') return false;
+    if (!state.grid || typeof state.grid !== 'object') return false;
+    if (state.grid.size !== this.size) return false;
+    if (!Array.isArray(state.grid.cells) || state.grid.cells.length !== this.size) return false;
+
+    for (let x = 0; x < this.size; x++) {
+      const col = state.grid.cells[x];
+      if (!Array.isArray(col) || col.length !== this.size) return false;
+
+      for (let y = 0; y < this.size; y++) {
+        const cell = col[y];
+        if (cell !== null) {
+          if (!cell || typeof cell !== 'object') return false;
+          if (typeof cell.value !== 'number' || cell.value < 2 || Number.isNaN(cell.value)) return false;
+          if (!cell.position || typeof cell.position !== 'object') return false;
+          if (cell.position.x !== x || cell.position.y !== y) return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   // Set up the game
   setup() {
     const previousState = this.storageManager.getGameState();
 
-    // Reload the game from a previous game if present
-    if (previousState) {
+    // Reload the game from a previous game if present and valid
+    if (this.isValidGameState(previousState)) {
       this.grid = new Grid(
         previousState.grid.size,
         previousState.grid.cells
@@ -52,6 +81,10 @@ export class GameManager {
         previousState.keepPlayingState || previousState.keepPlaying
       );
     } else {
+      if (previousState !== null) {
+        // Clear corrupted / invalid save from storage
+        this.storageManager.clearGameState();
+      }
       this.grid = new Grid(this.size);
       this.score = 0;
       this.over = false;
