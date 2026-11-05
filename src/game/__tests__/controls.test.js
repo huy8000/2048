@@ -11,12 +11,12 @@ describe('KeyboardInputManager', () => {
     document.body.innerHTML = `
       <div class="game-container">
         <div class="game-message">
-          <button type="button" class="keep-playing-button">Keep going</button>
-          <button type="button" class="retry-button">Try again</button>
+          <button type="button" class="keep-playing-button">继续挑战</button>
+          <button type="button" class="retry-button">再试一次</button>
         </div>
         <div class="grid-container"></div>
       </div>
-      <button type="button" class="restart-button">New Game</button>
+      <button type="button" class="restart-button">新游戏</button>
     `;
 
     container = document.querySelector('.game-container');

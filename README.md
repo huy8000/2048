@@ -1,73 +1,73 @@
-# 2048 (Modernized Edition)
+# 2048（现代化重构版）
 
-A modernized, high-performance, and lightweight edition of Gabriele Cirulli's classic [2048](https://github.com/gabrielecirulli/2048) game, redesigned with **Native ES Modules**, **Vite 8**, and **Vitest**.
+基于 Gabriele Cirulli 经典开源作品 [2048](https://github.com/gabrielecirulli/2048) 进行现代化深度重构的高性能、轻量级数字方块游戏。全面采用 **原生 ES 模块（Native ES Modules）**、**Vite 8** 与 **Vitest** 构建。
 
-100% faithful to the original visual styling, animations, colors, and responsive layout, with all obsolete legacy code and heavy assets removed.
-
----
-
-## ✨ Modern Improvements & Engineering Highlights
-
-- ⚡ **Native ES Modules (Zero Runtime Framework Overhead)**:
-  - Clean ES6+ classes (`Grid`, `Tile`, `GameManager`, `HTMLActuator`, `KeyboardInputManager`, `LocalStorageManager`).
-  - Modular Architecture: Fully decoupled ES Modules with dependency injection for input, storage, and rendering. (Exposes optional `window.game` only as a browser console debugging handle).
-- 📦 **Vite 8 Build System**:
-  - Blazing fast builds (< 50ms) and HMR.
-  - Outputs 10-char hashed production assets (`app.[hash].js`, `css.[hash].css`) configured via native `rolldownOptions` for long-term immutable caching.
-- 🛡️ **Storage Resilience & Schema Validation**:
-  - Full structural and mathematical validation for saved games in `localStorage` (grid dimensions, coordinate integrity, power-of-2 integer tile values, and non-negative integer score).
-  - Gracefully recovers from malformed or corrupted save data without throwing runtime exceptions.
-  - **Immediate Persistence**: Clicking "Keep going" after reaching 2048 immediately persists the continued state, preventing dialog re-triggering upon refresh.
-- 📱 **Mobile Touch & Accessibility**:
-  - **Touch Fix**: Touch-based swipe detection is strictly scoped to the playing board, preventing suppression of click events on dialog buttons (`Keep going`, `Try again`).
-  - **Semantic HTML**: Converted non-semantic `<a>` buttons to accessible `<button type="button">` elements with native keyboard navigation (Tab/Enter/Space) while preserving 100% pixel-perfect retro styling.
-  - **User Zoom**: Viewport allows scaling for accessibility.
-- 🪶 **Asset Size Optimization**:
-  - Removed outdated, heavy `.svg` and `.eot` font files (~300KB deleted).
-  - Kept only clean `.woff` font files with modern system font fallbacks.
-  - Stripped redundant vendor prefixes (`-webkit-`, `-moz-`, `-ms-`) from CSS.
-  - Total production bundle: **~11KB JS + ~8KB CSS** (Gzip **< 6KB**).
-- 🧪 **Comprehensive Unit Test Suite**:
-  - 43 tests across 6 suites covering tile operations, grid boundaries, merge logic across all 4 directions (including `[2,2,2,2]` no-chain-reaction rule), full lifecycle victory/continuation/loss transitions, BigInt-safe power-of-2 integer validation, touch event exclusion, and DOM actuator rendering.
-- 🤖 **Automated CI Workflow**:
-  - GitHub Actions CI workflow running tests and production builds on Node.js 22.
+100% 保持原版经典视觉质感、动效、色彩与响应式布局，同时彻底移除所有过时废弃代码与冗余体积资源。
 
 ---
 
-## 🎮 How to Play
+## ✨ 现代工程改进与技术亮点
 
-- **Desktop**:
-  - **Arrow Keys** / **WASD** / **Vim Keys (HJKL)**: Move tiles in the 4 directions.
-  - **R Key**: Restart game.
-- **Mobile**:
-  - **Swipe Up / Down / Left / Right**: Move tiles.
-  - When two tiles with the same number touch, they **merge into one** with double the number!
+- ⚡ **原生 ES 模块（零运行时框架开销）**：
+  - 纯粹 ES6+ 面向对象设计（`Grid`、`Tile`、`GameManager`、`HTMLActuator`、`KeyboardInputManager`、`LocalStorageManager`）。
+  - 模块化解耦架构：采用依赖注入解耦输入、存储与渲染层（仅保留可选的 `window.game` 作为浏览器控制台调试句柄）。
+- 📦 **Vite 8 极速构建体系**：
+  - 秒级极速热重载（HMR）与极快构建体验（构建耗时 < 50ms）。
+  - 通过内置 `rolldownOptions` 配置 10 位哈希生产产物命名（`app.[hash].js`、`css.[hash].css`），实现长期不可变静态资源缓存。
+- 🛡️ **本地存档健壮性与完整性校验**：
+  - 对 `localStorage` 存档进行严格的数据结构与数学规则校验（棋盘尺寸、坐标边界、基于 BigInt 安全的 2 的整数次幂方块值、非负整数得分校验）。
+  - 遇到格式错误或损坏的存档数据时自动重置，避免抛出运行时异常导致白屏崩溃。
+  - **即时状态持久化**：合成 2048 后点击“继续挑战”会立即写入持久化存储，防止刷新页面后重复弹出胜利弹窗。
+- 📱 **移动端触控优化与无障碍访问**：
+  - **手势拦截修复**：触屏滑动手势判定精确限定在棋盘区域内，彻底解决遮罩层操作按钮（“继续挑战”、“再试一次”）在移动端被误拦截无法点击的问题。
+  - **语义化标签重构**：将原版非语义化 `<a>` 伪按钮替换为标准的 `<button type="button">` 元素，原生支持键盘导航聚焦与回车触发，同时 100% 保持原有像素级复古外观。
+  - **页面缩放友好**：放宽 Viewport 缩放限制，提升移动端无障碍访问体验。
+- 🪶 **资源体积极限精简**：
+  - 剔除历史过时的 `.svg` 和 `.eot` 字体文件（节省约 300KB 体积）。
+  - 仅保留现代通用的 `.woff` 字体，并补充平滑的现代系统字体回退方案（针对中文字体优化了 PingFang SC、Hiragino Sans GB、Microsoft YaHei 等）。
+  - 清理 CSS 中过时的私有浏览器前缀（`-webkit-`、`-moz-`、`-ms-`）。
+  - 最终打包体积：**~11KB JS + ~8KB CSS**（Gzip 压缩后 **< 6KB**）。
+- 🧪 **严苛的自动化测试套件**：
+  - 覆盖 6 个测试套件、共 43 个单元测试用例，涵盖方块操作、棋盘边界、全方向移动合并逻辑（包含经典 `[2,2,2,2]` 一次移动不连环合并规则）、完整的获胜/继续/失败状态机转换、BigInt 级 2 的幂整数校验、移动端触控事件隔离以及 DOM 渲染器生命周期。
+- 🤖 **自动化 CI 工作流**：
+  - 配置 GitHub Actions 自动化 CI，在 Node.js 22 环境下全量运行自动化测试与生产打包。
 
 ---
 
-## 🛠️ Development & Build
+## 🎮 操作指南
+
+- **电脑桌面端**：
+  - **方向键（↑ / ↓ / ← / →）** 或 **WASD** 或 **Vim 键位（H / J / K / L）**：控制方块向 4 个方向滑动合并。
+  - **R 键**：重新开始新游戏。
+- **手机移动端**：
+  - **上下左右滑动屏幕**：移动方块。
+  - 当两个数字相同的方块在移动中相撞时，它们会 **合并成为一个数值翻倍的方块！**
+
+---
+
+## 🛠️ 本地开发与构建
 
 ```bash
-# Install dependencies
+# 安装依赖
 npm install
 
-# Start local development server
+# 启动本地开发服务器
 npm run dev
 
-# Run unit tests (43 tests)
+# 执行单元测试套件（43 个用例全部通过）
 npm test
 
-# Build production bundle
+# 打包生产版本产物
 npm run build
 
-# Preview production build locally
+# 本地预览生产构建产物
 npm run preview
 ```
 
 ---
 
-## 📄 License
+## 📄 开源许可与致谢
 
-Original game created by [Gabriele Cirulli](http://gabrielecirulli.com). Based on [1024 by Veewo Studio](https://itunes.apple.com/us/app/1024!/id823499224) and conceptually similar to [Threes by Asher Vollmer](http://asherv.com/threes/).
+原版游戏作者为 [Gabriele Cirulli](http://gabrielecirulli.com)。基于 Veewo Studio 的 [1024](https://itunes.apple.com/us/app/1024!/id823499224) 制作，概念灵感源自 Asher Vollmer 的 [Threes](http://asherv.com/threes/)。
 
-Licensed under the [MIT License](./LICENSE).
+本项目采用 [MIT 许可证](./LICENSE) 开源。

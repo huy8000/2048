@@ -17,8 +17,8 @@ describe('HTMLActuator DOM Rendering', () => {
         <div class="game-message">
           <p></p>
           <div class="lower">
-            <button type="button" class="keep-playing-button">Keep going</button>
-            <button type="button" class="retry-button">Try again</button>
+            <button type="button" class="keep-playing-button">继续挑战</button>
+            <button type="button" class="retry-button">再试一次</button>
           </div>
         </div>
         <div class="tile-container"></div>
@@ -82,14 +82,14 @@ describe('HTMLActuator DOM Rendering', () => {
   it('should show game-won and game-over messages and clear them on continueGame()', () => {
     actuator.message(true); // Win
     expect(messageContainer.classList.contains('game-won')).toBe(true);
-    expect(messageContainer.querySelector('p').textContent).toBe('You win!');
+    expect(messageContainer.querySelector('p').textContent).toBe('挑战成功！');
 
     actuator.continueGame();
     expect(messageContainer.classList.contains('game-won')).toBe(false);
 
     actuator.message(false); // Game Over
     expect(messageContainer.classList.contains('game-over')).toBe(true);
-    expect(messageContainer.querySelector('p').textContent).toBe('Game over!');
+    expect(messageContainer.querySelector('p').textContent).toBe('游戏结束！');
 
     actuator.continueGame();
     expect(messageContainer.classList.contains('game-over')).toBe(false);
@@ -111,7 +111,7 @@ describe('HTMLActuator DOM Rendering', () => {
     await new Promise((resolve) => window.requestAnimationFrame(resolve));
 
     expect(messageContainer.classList.contains('game-won')).toBe(true);
-    expect(messageContainer.querySelector('p').textContent).toBe('You win!');
+    expect(messageContainer.querySelector('p').textContent).toBe('挑战成功！');
     const keepBtn = messageContainer.querySelector('.keep-playing-button');
     expect(keepBtn.style.display).toBe('none');
   });
@@ -131,7 +131,7 @@ describe('HTMLActuator DOM Rendering', () => {
     );
     await new Promise((resolve) => window.requestAnimationFrame(resolve));
     expect(messageContainer.classList.contains('game-won')).toBe(true);
-    expect(messageContainer.querySelector('p').textContent).toBe('You win!');
+    expect(messageContainer.querySelector('p').textContent).toBe('挑战成功！');
     const keepBtn = messageContainer.querySelector('.keep-playing-button');
     expect(keepBtn.style.display).toBe('inline-block');
 
@@ -156,6 +156,6 @@ describe('HTMLActuator DOM Rendering', () => {
     // Must show Game over!, NOT You win!
     expect(messageContainer.classList.contains('game-over')).toBe(true);
     expect(messageContainer.classList.contains('game-won')).toBe(false);
-    expect(messageContainer.querySelector('p').textContent).toBe('Game over!');
+    expect(messageContainer.querySelector('p').textContent).toBe('游戏结束！');
   });
 });

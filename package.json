@@ -1,7 +1,7 @@
 {
   "name": "2048",
   "version": "2.0.0",
-  "description": "A modernized, lightweight edition of the classic 2048 game using native ES Modules, Vite 8, and Vitest.",
+  "description": "经典 2048 数字方块游戏现代化版本，采用原生 ES 模块、Vite 8 与 Vitest 构建。",
   "private": true,
   "type": "module",
   "engines": {

@@ -135,7 +135,7 @@ export class HTMLActuator {
   message(won, canKeepGoing = true) {
     if (!this.messageContainer) return;
     const type = won ? 'game-won' : 'game-over';
-    const message = won ? 'You win!' : 'Game over!';
+    const message = won ? '挑战成功！' : '游戏结束！';
 
     this.messageContainer.classList.add(type);
     const p = this.messageContainer.getElementsByTagName('p')[0];
