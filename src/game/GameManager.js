@@ -39,7 +39,7 @@ export class GameManager {
   // Validate saved game structure from localStorage to prevent crashes from corrupted data
   isValidGameState(state) {
     if (!state || typeof state !== 'object') return false;
-    if (typeof state.score !== 'number' || !Number.isInteger(state.score) || state.score < 0) return false;
+    if (typeof state.score !== 'number' || !Number.isSafeInteger(state.score) || state.score < 0) return false;
     if (typeof state.over !== 'boolean') return false;
     if (typeof state.won !== 'boolean') return false;
     if (!state.grid || typeof state.grid !== 'object') return false;
@@ -54,13 +54,9 @@ export class GameManager {
         const cell = col[y];
         if (cell !== null) {
           if (!cell || typeof cell !== 'object') return false;
-          // Must be a positive integer power of 2 (2, 4, 8, 16, 32, 64, ...)
-          if (
-            typeof cell.value !== 'number' ||
-            !Number.isInteger(cell.value) ||
-            cell.value < 2 ||
-            (cell.value & (cell.value - 1)) !== 0
-          ) {
+          // Must be a safe positive integer power of 2 (2, 4, 8, 16, 32, 64, ...)
+          // Uses BigInt to prevent 32-bit bitwise overflow false positives (e.g., 4294967298)
+          if (!this.isPowerOfTwo(cell.value)) {
             return false;
           }
           if (!cell.position || typeof cell.position !== 'object') return false;
@@ -70,6 +66,14 @@ export class GameManager {
     }
 
     return true;
+  }
+
+  isPowerOfTwo(value) {
+    if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 2) {
+      return false;
+    }
+    const n = BigInt(value);
+    return (n & (n - 1n)) === 0n;
   }
 
   // Set up the game

@@ -315,6 +315,28 @@ describe('GameManager Core & Edge Cases', () => {
           grid: {
             size: 4,
             cells: Array.from({ length: 4 }, (_, x) =>
+              Array.from({ length: 4 }, (_, y) => (x === 0 && y === 0 ? { position: { x: 0, y: 0 }, value: 4294967298 } : null))
+            ),
+          },
+        },
+        {
+          score: 100,
+          over: false,
+          won: false,
+          grid: {
+            size: 4,
+            cells: Array.from({ length: 4 }, (_, x) =>
+              Array.from({ length: 4 }, (_, y) => (x === 0 && y === 0 ? { position: { x: 0, y: 0 }, value: 12884901888 } : null))
+            ),
+          },
+        },
+        {
+          score: 100,
+          over: false,
+          won: false,
+          grid: {
+            size: 4,
+            cells: Array.from({ length: 4 }, (_, x) =>
               Array.from({ length: 4 }, (_, y) => (x === 0 && y === 0 ? { position: { x: 99, y: 99 }, value: 2 } : null))
             ),
           },
@@ -333,6 +355,21 @@ describe('GameManager Core & Edge Cases', () => {
         expect(gm.grid.availableCells().length).toBe(14);
         expect(mockStorage.getGameState()).not.toBe(badState);
       }
+    });
+
+    it('should correctly validate powers of two using BigInt to prevent 32-bit bitwise overflow', () => {
+      expect(gm.isPowerOfTwo(2)).toBe(true);
+      expect(gm.isPowerOfTwo(2048)).toBe(true);
+      expect(gm.isPowerOfTwo(4294967296)).toBe(true); // 2^32
+      expect(gm.isPowerOfTwo(8589934592)).toBe(true); // 2^33
+
+      expect(gm.isPowerOfTwo(3)).toBe(false);
+      expect(gm.isPowerOfTwo(2.5)).toBe(false);
+      expect(gm.isPowerOfTwo(4294967298)).toBe(false); // 2^32 + 2: 32-bit bitwise overflow trap
+      expect(gm.isPowerOfTwo(12884901888)).toBe(false); // 3 * 2^32
+      expect(gm.isPowerOfTwo(-4)).toBe(false);
+      expect(gm.isPowerOfTwo(0)).toBe(false);
+      expect(gm.isPowerOfTwo(1)).toBe(false);
     });
 
     it('should restore valid stored state correctly', () => {

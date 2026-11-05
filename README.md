@@ -28,7 +28,7 @@ A modernized, high-performance, and lightweight edition of Gabriele Cirulli's cl
   - Stripped redundant vendor prefixes (`-webkit-`, `-moz-`, `-ms-`) from CSS.
   - Total production bundle: **~11KB JS + ~8KB CSS** (Gzip **< 6KB**).
 - 🧪 **Comprehensive Unit Test Suite**:
-  - 42 tests across 6 suites covering tile operations, grid boundaries, merge logic across all 4 directions (including `[2,2,2,2]` no-chain-reaction rule), full lifecycle victory/continuation/loss transitions, corrupted storage recovery, touch event exclusion, and DOM actuator rendering.
+  - 43 tests across 6 suites covering tile operations, grid boundaries, merge logic across all 4 directions (including `[2,2,2,2]` no-chain-reaction rule), full lifecycle victory/continuation/loss transitions, BigInt-safe power-of-2 integer validation, touch event exclusion, and DOM actuator rendering.
 - 🤖 **Automated CI Workflow**:
   - GitHub Actions CI workflow running tests and production builds on Node.js 22.
 
@@ -54,7 +54,7 @@ npm install
 # Start local development server
 npm run dev
 
-# Run unit tests (42 tests)
+# Run unit tests (43 tests)
 npm test
 
 # Build production bundle
