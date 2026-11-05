@@ -95,7 +95,7 @@ describe('HTMLActuator DOM Rendering', () => {
     expect(messageContainer.classList.contains('game-over')).toBe(false);
   });
 
-  it('should prioritize You win! over Game over! when both won and over are true', async () => {
+  it('should prioritize You win! over Game over! when both won and over are true initially (and hide Keep going button)', async () => {
     actuator.actuate(
       { cells: [[], [], [], []] },
       {
@@ -104,6 +104,7 @@ describe('HTMLActuator DOM Rendering', () => {
         won: true,
         over: true,
         terminated: true,
+        keepPlaying: false,
       }
     );
 
@@ -111,5 +112,50 @@ describe('HTMLActuator DOM Rendering', () => {
 
     expect(messageContainer.classList.contains('game-won')).toBe(true);
     expect(messageContainer.querySelector('p').textContent).toBe('You win!');
+    const keepBtn = messageContainer.querySelector('.keep-playing-button');
+    expect(keepBtn.style.display).toBe('none');
+  });
+
+  it('should show Game over! instead of You win! if player runs out of moves after choosing Keep going', async () => {
+    // 1. Player reaches 2048 and wins
+    actuator.actuate(
+      { cells: [[], [], [], []] },
+      {
+        score: 2048,
+        bestScore: 2048,
+        won: true,
+        over: false,
+        terminated: true,
+        keepPlaying: false,
+      }
+    );
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+    expect(messageContainer.classList.contains('game-won')).toBe(true);
+    expect(messageContainer.querySelector('p').textContent).toBe('You win!');
+    const keepBtn = messageContainer.querySelector('.keep-playing-button');
+    expect(keepBtn.style.display).toBe('inline-block');
+
+    // 2. Player clicks Keep going
+    actuator.continueGame();
+    expect(messageContainer.classList.contains('game-won')).toBe(false);
+
+    // 3. Player eventually runs out of moves (won is still true, but keepPlaying is true, over is true)
+    actuator.actuate(
+      { cells: [[], [], [], []] },
+      {
+        score: 3000,
+        bestScore: 3000,
+        won: true,
+        over: true,
+        terminated: true,
+        keepPlaying: true,
+      }
+    );
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+
+    // Must show Game over!, NOT You win!
+    expect(messageContainer.classList.contains('game-over')).toBe(true);
+    expect(messageContainer.classList.contains('game-won')).toBe(false);
+    expect(messageContainer.querySelector('p').textContent).toBe('Game over!');
   });
 });

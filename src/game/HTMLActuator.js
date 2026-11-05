@@ -24,10 +24,18 @@ export class HTMLActuator {
       this.updateBestScore(metadata.bestScore);
 
       if (metadata.terminated) {
-        if (metadata.won) {
-          this.message(true); // You win! (Victory takes precedence)
-        } else if (metadata.over) {
-          this.message(false); // You lose
+        if (metadata.over) {
+          if (metadata.won && !metadata.keepPlaying) {
+            // Reached 2048 on the final possible move without having chosen to keep going yet:
+            // Celebrate victory, but do not show "Keep going" since no moves remain.
+            this.message(true, false);
+          } else {
+            // Either regular game over, or game over after choosing to keep playing past 2048:
+            this.message(false);
+          }
+        } else if (metadata.won) {
+          // Reached 2048 with moves still available: regular victory with "Keep going" option
+          this.message(true, true);
         }
       }
     });
@@ -124,7 +132,7 @@ export class HTMLActuator {
     this.bestContainer.textContent = bestScore;
   }
 
-  message(won) {
+  message(won, canKeepGoing = true) {
     if (!this.messageContainer) return;
     const type = won ? 'game-won' : 'game-over';
     const message = won ? 'You win!' : 'Game over!';
@@ -132,10 +140,19 @@ export class HTMLActuator {
     this.messageContainer.classList.add(type);
     const p = this.messageContainer.getElementsByTagName('p')[0];
     if (p) p.textContent = message;
+
+    const keepButton = this.messageContainer.querySelector('.keep-playing-button');
+    if (keepButton) {
+      keepButton.style.display = won && canKeepGoing ? 'inline-block' : 'none';
+    }
   }
 
   clearMessage() {
     if (!this.messageContainer) return;
     this.messageContainer.classList.remove('game-won', 'game-over');
+    const keepButton = this.messageContainer.querySelector('.keep-playing-button');
+    if (keepButton) {
+      keepButton.style.display = '';
+    }
   }
 }

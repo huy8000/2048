@@ -208,6 +208,40 @@ describe('GameManager Core & Edge Cases', () => {
       expect(saved.keepPlayingState).toBe(true);
       expect(saved.won).toBe(true);
     });
+
+    it('should transition to over with keepPlaying=true when moves run out after continuing', () => {
+      // 1. Player reaches 2048 and continues
+      gm.won = true;
+      gm.keepPlaying();
+      expect(gm.keepPlayingState).toBe(true);
+      expect(gm.isGameTerminated()).toBe(false);
+
+      // 2. Set up board to run out of moves
+      gm.grid = new gm.grid.constructor(4);
+      gm.grid.insertTile(new Tile({ x: 0, y: 0 }, 2));
+      gm.grid.insertTile(new Tile({ x: 0, y: 1 }, 2));
+      gm.grid.insertTile(new Tile({ x: 0, y: 2 }, 8));
+      gm.grid.insertTile(new Tile({ x: 0, y: 3 }, 16));
+
+      for (let x = 1; x < 4; x++) {
+        for (let y = 0; y < 4; y++) {
+          gm.grid.insertTile(new Tile({ x, y }, (x + y) % 2 === 0 ? 64 : 32));
+        }
+      }
+
+      gm.addRandomTile = () => {
+        gm.grid.insertTile(new Tile({ x: 0, y: 3 }, 128));
+      };
+
+      gm.move(0); // Up: board fills and no moves remain
+      expect(gm.movesAvailable()).toBe(false);
+      expect(gm.over).toBe(true);
+      expect(gm.won).toBe(true);
+      expect(gm.isGameTerminated()).toBe(true);
+      expect(mockActuator.lastMeta.over).toBe(true);
+      expect(mockActuator.lastMeta.won).toBe(true);
+      expect(mockActuator.lastMeta.keepPlaying).toBe(true);
+    });
   });
 
   describe('Game Over Detection', () => {

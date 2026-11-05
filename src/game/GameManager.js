@@ -135,6 +135,7 @@ export class GameManager {
       won: this.won,
       bestScore: this.storageManager.getBestScore(),
       terminated: this.isGameTerminated(),
+      keepPlaying: this.keepPlayingState,
     });
   }
 
