@@ -10,12 +10,12 @@ A modernized, high-performance, and lightweight edition of Gabriele Cirulli's cl
 
 - ⚡ **Native ES Modules (Zero Runtime Framework Overhead)**:
   - Clean ES6+ classes (`Grid`, `Tile`, `GameManager`, `HTMLActuator`, `KeyboardInputManager`, `LocalStorageManager`).
-  - No global namespace pollution; fully decoupled architecture with dependency injection for input, storage, and rendering.
+  - Modular Architecture: Fully decoupled ES Modules with dependency injection for input, storage, and rendering. (Exposes optional `window.game` only as a browser console debugging handle).
 - 📦 **Vite 8 Build System**:
   - Blazing fast builds (< 50ms) and HMR.
-  - Outputs 10-char hashed production assets (`app.[hash].js`, `css.[hash].css`) configured via modern `rolldownOptions` and `rollupOptions` aliases for long-term immutable caching.
+  - Outputs 10-char hashed production assets (`app.[hash].js`, `css.[hash].css`) configured via native `rolldownOptions` for long-term immutable caching.
 - 🛡️ **Storage Resilience & Schema Validation**:
-  - Full structural validation for saved games in `localStorage` (grid dimensions, coordinate integrity, numeric validity).
+  - Full structural and mathematical validation for saved games in `localStorage` (grid dimensions, coordinate integrity, power-of-2 integer tile values, and non-negative integer score).
   - Gracefully recovers from malformed or corrupted save data without throwing runtime exceptions.
   - **Immediate Persistence**: Clicking "Keep going" after reaching 2048 immediately persists the continued state, preventing dialog re-triggering upon refresh.
 - 📱 **Mobile Touch & Accessibility**:

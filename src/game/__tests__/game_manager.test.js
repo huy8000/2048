@@ -284,6 +284,30 @@ describe('GameManager Core & Edge Cases', () => {
         { score: 100, over: false, won: false, grid: { size: 3 } },
         { score: 100, over: false, won: false, grid: { size: 4, cells: 'corrupted' } },
         { score: 100, over: false, won: false, grid: { size: 4, cells: [[null]] } },
+        { score: 100.5, over: false, won: false, grid: { size: 4, cells: Array.from({ length: 4 }, () => Array(4).fill(null)) } },
+        { score: -5, over: false, won: false, grid: { size: 4, cells: Array.from({ length: 4 }, () => Array(4).fill(null)) } },
+        {
+          score: 100,
+          over: false,
+          won: false,
+          grid: {
+            size: 4,
+            cells: Array.from({ length: 4 }, (_, x) =>
+              Array.from({ length: 4 }, (_, y) => (x === 0 && y === 0 ? { position: { x: 0, y: 0 }, value: 3 } : null))
+            ),
+          },
+        },
+        {
+          score: 100,
+          over: false,
+          won: false,
+          grid: {
+            size: 4,
+            cells: Array.from({ length: 4 }, (_, x) =>
+              Array.from({ length: 4 }, (_, y) => (x === 0 && y === 0 ? { position: { x: 0, y: 0 }, value: 2.5 } : null))
+            ),
+          },
+        },
         {
           score: 100,
           over: false,
