@@ -94,4 +94,22 @@ describe('HTMLActuator DOM Rendering', () => {
     actuator.continueGame();
     expect(messageContainer.classList.contains('game-over')).toBe(false);
   });
+
+  it('should prioritize You win! over Game over! when both won and over are true', async () => {
+    actuator.actuate(
+      { cells: [[], [], [], []] },
+      {
+        score: 2048,
+        bestScore: 2048,
+        won: true,
+        over: true,
+        terminated: true,
+      }
+    );
+
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+
+    expect(messageContainer.classList.contains('game-won')).toBe(true);
+    expect(messageContainer.querySelector('p').textContent).toBe('You win!');
+  });
 });

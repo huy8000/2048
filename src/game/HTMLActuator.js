@@ -24,10 +24,10 @@ export class HTMLActuator {
       this.updateBestScore(metadata.bestScore);
 
       if (metadata.terminated) {
-        if (metadata.over) {
+        if (metadata.won) {
+          this.message(true); // You win! (Victory takes precedence)
+        } else if (metadata.over) {
           this.message(false); // You lose
-        } else if (metadata.won) {
-          this.message(true); // You win!
         }
       }
     });

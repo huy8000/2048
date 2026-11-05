@@ -70,7 +70,12 @@ describe('GameManager Core & Edge Cases', () => {
     expect(gm.grid.availableCells().length).toBe(14); // 16 - 2
   });
 
-  describe('Merging algorithms across all directions', () => {
+  describe('Merging algorithms across all directions (Deterministic)', () => {
+    beforeEach(() => {
+      // Mock addRandomTile to eliminate randomness during pure merge assertions
+      gm.addRandomTile = () => {};
+    });
+
     it('should correctly merge [2, 2, 2, 2] into [4, 4, 0, 0] when moving left (no chain reaction)', () => {
       gm.grid = new gm.grid.constructor(4);
       for (let x = 0; x < 4; x++) {
@@ -83,6 +88,7 @@ describe('GameManager Core & Edge Cases', () => {
       expect(gm.grid.cellContent({ x: 0, y: 0 })?.value).toBe(4);
       expect(gm.grid.cellContent({ x: 1, y: 0 })?.value).toBe(4);
       expect(gm.grid.cellContent({ x: 2, y: 0 })).toBeNull();
+      expect(gm.grid.cellContent({ x: 3, y: 0 })).toBeNull();
       expect(gm.score).toBe(8);
     });
 
@@ -134,6 +140,18 @@ describe('GameManager Core & Edge Cases', () => {
     });
   });
 
+  describe('Random Tile Generation', () => {
+    it('should spawn a new tile in an available cell on valid moves', () => {
+      gm.grid = new gm.grid.constructor(4);
+      gm.grid.insertTile(new Tile({ x: 0, y: 0 }, 2));
+      gm.grid.insertTile(new Tile({ x: 0, y: 1 }, 2));
+
+      expect(gm.grid.availableCells().length).toBe(14);
+      gm.move(0); // Move Up: 2+2 merges into 4 (leaves 15 cells open), then addRandomTile spawns 1 tile -> 14 open
+      expect(gm.grid.availableCells().length).toBe(14);
+    });
+  });
+
   describe('Winning and Continuation Persistence', () => {
     it('should detect 2048 winning condition', () => {
       gm.grid = new gm.grid.constructor(4);
@@ -144,6 +162,37 @@ describe('GameManager Core & Edge Cases', () => {
 
       expect(gm.won).toBe(true);
       expect(gm.isGameTerminated()).toBe(true);
+    });
+
+    it('should prioritize winning even if no further moves are available after reaching 2048', () => {
+      gm.grid = new gm.grid.constructor(4);
+      // Col 0: (0, 0)=1024, (0, 1)=1024, (0, 2)=8, (0, 3)=16
+      gm.grid.insertTile(new Tile({ x: 0, y: 0 }, 1024));
+      gm.grid.insertTile(new Tile({ x: 0, y: 1 }, 1024));
+      gm.grid.insertTile(new Tile({ x: 0, y: 2 }, 8));
+      gm.grid.insertTile(new Tile({ x: 0, y: 3 }, 16));
+
+      // Cols 1..3: checkerboard of 32 and 64
+      for (let x = 1; x < 4; x++) {
+        for (let y = 0; y < 4; y++) {
+          gm.grid.insertTile(new Tile({ x, y }, (x + y) % 2 === 0 ? 64 : 32));
+        }
+      }
+
+      // Moving Up merges (0, 0)+(0, 1) into 2048 at (0, 0).
+      // (0, 2)=8 moves to (0, 1), (0, 3)=16 moves to (0, 2), leaving (0, 3) as the only empty cell.
+      // Mock addRandomTile to fill (0, 3) with an unmergeable 128:
+      gm.addRandomTile = () => {
+        gm.grid.insertTile(new Tile({ x: 0, y: 3 }, 128));
+      };
+
+      gm.move(0); // Up: merges into 2048 at (0, 0)
+      expect(gm.won).toBe(true);
+      expect(gm.movesAvailable()).toBe(false);
+      expect(gm.over).toBe(true);
+      // Actuator must receive won: true and terminated: true
+      expect(mockActuator.lastMeta.won).toBe(true);
+      expect(mockActuator.lastMeta.terminated).toBe(true);
     });
 
     it('should immediately persist keepPlaying state to storage', () => {
@@ -158,6 +207,37 @@ describe('GameManager Core & Edge Cases', () => {
       expect(saved).not.toBeNull();
       expect(saved.keepPlayingState).toBe(true);
       expect(saved.won).toBe(true);
+    });
+  });
+
+  describe('Game Over Detection', () => {
+    it('should detect game over and set over flag when no moves are available', () => {
+      gm.grid = new gm.grid.constructor(4);
+      // Col 0: (0, 0)=2, (0, 1)=2, (0, 2)=8, (0, 3)=16
+      gm.grid.insertTile(new Tile({ x: 0, y: 0 }, 2));
+      gm.grid.insertTile(new Tile({ x: 0, y: 1 }, 2));
+      gm.grid.insertTile(new Tile({ x: 0, y: 2 }, 8));
+      gm.grid.insertTile(new Tile({ x: 0, y: 3 }, 16));
+
+      // Cols 1..3: checkerboard of 32 and 64
+      for (let x = 1; x < 4; x++) {
+        for (let y = 0; y < 4; y++) {
+          gm.grid.insertTile(new Tile({ x, y }, (x + y) % 2 === 0 ? 64 : 32));
+        }
+      }
+
+      // When moving Up (0), (0, 0) and (0, 1) merge into 4 at (0, 0),
+      // (0, 2) moves to (0, 1), (0, 3) moves to (0, 2), leaving (0, 3) as the only available cell!
+      // Mock addRandomTile to place 128 at (0, 3):
+      gm.addRandomTile = () => {
+        gm.grid.insertTile(new Tile({ x: 0, y: 3 }, 128));
+      };
+
+      gm.move(0); // Up: merges 2+2 into 4, then spawns 128 at (0, 3)
+      expect(gm.movesAvailable()).toBe(false);
+      expect(gm.over).toBe(true);
+      expect(gm.isGameTerminated()).toBe(true);
+      expect(mockActuator.lastMeta.over).toBe(true);
     });
   });
 
