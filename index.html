@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>2048 - 经典数字方块游戏</title>
+  <title>2048</title>
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -65,13 +65,14 @@
       <div class="tile-container"></div>
     </div>
 
-    <p class="game-explanation">
-      <strong class="important">玩法说明：</strong>使用 <strong>方向键（或触屏滑动）</strong> 移动方块。当两个具有相同数字的方块相碰时，它们会 <strong>合并为一个！</strong>
-    </p>
-    <hr>
-    <p>
-      由 <a href="http://gabrielecirulli.com" target="_blank" rel="noopener noreferrer">Gabriele Cirulli</a> 原创开发。基于 Veewo Studio 的 <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank" rel="noopener noreferrer">1024</a>，概念灵感源自 Asher Vollmer 的 <a href="http://asherv.com/threes/" target="_blank" rel="noopener noreferrer">Threes</a>。
-    </p>
+    <footer class="game-footer">
+      <p class="game-explanation">
+        玩法：使用方向键或触屏滑动，相同方块碰撞合并。
+      </p>
+      <p class="game-attribution">
+        原版由 <a href="http://gabrielecirulli.com" target="_blank" rel="noopener noreferrer">Gabriele Cirulli</a> 开发 · 灵感源自 1024 与 Threes
+      </p>
+    </footer>
   </div>
 
   <script type="module" src="/src/main.js"></script>
