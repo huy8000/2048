@@ -48,9 +48,7 @@ export class HTMLActuator {
 
   clearContainer(container) {
     if (!container) return;
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
+    container.replaceChildren();
   }
 
   addTile(tile) {
@@ -111,12 +109,19 @@ export class HTMLActuator {
 
   updateScore(score) {
     if (!this.scoreContainer) return;
-    this.clearContainer(this.scoreContainer);
+    const scoreVal = this.scoreContainer.querySelector('.score-value');
 
     const difference = score - this.score;
     this.score = score;
 
-    this.scoreContainer.textContent = this.score;
+    if (scoreVal) {
+      scoreVal.textContent = this.score;
+      const existingAddition = this.scoreContainer.querySelector('.score-addition');
+      if (existingAddition) existingAddition.remove();
+    } else {
+      this.clearContainer(this.scoreContainer);
+      this.scoreContainer.textContent = this.score;
+    }
 
     if (difference > 0) {
       const addition = document.createElement('div');
@@ -129,7 +134,12 @@ export class HTMLActuator {
 
   updateBestScore(bestScore) {
     if (!this.bestContainer) return;
-    this.bestContainer.textContent = bestScore;
+    const bestVal = this.bestContainer.querySelector('.score-value');
+    if (bestVal) {
+      bestVal.textContent = bestScore;
+    } else {
+      this.bestContainer.textContent = bestScore;
+    }
   }
 
   message(won, canKeepGoing = true) {

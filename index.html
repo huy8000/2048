@@ -7,27 +7,34 @@
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf8ef">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1e1e1e">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 </head>
 <body>
-  <div class="container">
-    <div class="heading">
+  <main class="container">
+    <header class="heading">
       <h1 class="title">2048</h1>
-      <div class="scores-container">
-        <div class="score-container">0</div>
-        <div class="best-container">0</div>
+      <div class="scores-container" aria-label="得分与记录">
+        <div class="score-container" aria-live="polite" aria-atomic="true">
+          <span class="score-label">得分</span>
+          <span class="score-value">0</span>
+        </div>
+        <div class="best-container" aria-live="polite" aria-atomic="true">
+          <span class="score-label">最高分</span>
+          <span class="score-value">0</span>
+        </div>
       </div>
-    </div>
+    </header>
 
     <div class="above-game">
       <p class="game-intro">合并相同数字，直冲 <strong>2048 方块！</strong></p>
       <button type="button" class="restart-button">新游戏</button>
     </div>
 
-    <div class="game-container">
-      <div class="game-message">
+    <div class="game-container" aria-label="2048 棋盘" role="region">
+      <div class="game-message" role="alert" aria-live="assertive">
         <p></p>
         <div class="lower">
           <button type="button" class="keep-playing-button">继续挑战</button>
@@ -35,7 +42,7 @@
         </div>
       </div>
 
-      <div class="grid-container">
+      <div class="grid-container" aria-hidden="true">
         <div class="grid-row">
           <div class="grid-cell"></div>
           <div class="grid-cell"></div>
@@ -70,10 +77,10 @@
         玩法：使用方向键或触屏滑动，相同方块碰撞合并。
       </p>
       <p class="game-attribution">
-        原版由 <a href="http://gabrielecirulli.com" target="_blank" rel="noopener noreferrer">Gabriele Cirulli</a> 开发 · 灵感源自 1024 与 Threes
+        原版由 <a href="https://gabrielecirulli.com" target="_blank" rel="noopener noreferrer">Gabriele Cirulli</a> 开发 · 灵感源自 1024 与 Threes
       </p>
     </footer>
-  </div>
+  </main>
 
   <script type="module" src="/src/main.js"></script>
 </body>

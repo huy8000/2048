@@ -263,8 +263,8 @@ export class GameManager {
     }
 
     // Always traverse from the farthest cell in the chosen direction
-    if (vector.x === 1) traversals.x = [...traversals.x].reverse();
-    if (vector.y === 1) traversals.y = [...traversals.y].reverse();
+    if (vector.x === 1) traversals.x = traversals.x.toReversed();
+    if (vector.y === 1) traversals.y = traversals.y.toReversed();
 
     return traversals;
   }

@@ -6,7 +6,7 @@ const fakeStorage = {
   },
 
   getItem(id) {
-    return Object.prototype.hasOwnProperty.call(this._data, id)
+    return Object.hasOwn(this._data, id)
       ? this._data[id]
       : undefined;
   },

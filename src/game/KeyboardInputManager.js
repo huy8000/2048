@@ -1,7 +1,7 @@
 export class KeyboardInputManager {
   constructor() {
     this.events = {};
-    this.handlers = [];
+    this.controller = new AbortController();
 
     this.listen();
   }
@@ -54,17 +54,19 @@ export class KeyboardInputManager {
       65: 3, // A
     };
 
+    const { signal } = this.controller;
+
     // Respond to direction keys
     const keydownHandler = (event) => {
       const modifiers =
         event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
 
       let mapped;
-      if (event.code && Object.prototype.hasOwnProperty.call(keyMap, event.code)) {
+      if (event.code && Object.hasOwn(keyMap, event.code)) {
         mapped = keyMap[event.code];
-      } else if (event.key && Object.prototype.hasOwnProperty.call(keyMap, event.key)) {
+      } else if (event.key && Object.hasOwn(keyMap, event.key)) {
         mapped = keyMap[event.key];
-      } else if (event.which && Object.prototype.hasOwnProperty.call(whichMap, event.which)) {
+      } else if (event.which && Object.hasOwn(whichMap, event.which)) {
         mapped = whichMap[event.which];
       }
 
@@ -82,8 +84,7 @@ export class KeyboardInputManager {
       }
     };
 
-    document.addEventListener('keydown', keydownHandler);
-    this.handlers.push({ target: document, type: 'keydown', fn: keydownHandler });
+    document.addEventListener('keydown', keydownHandler, { signal });
 
     // Respond to button presses
     this.bindButtonPress('.retry-button', (e) => this.restart(e));
@@ -147,13 +148,49 @@ export class KeyboardInputManager {
         }
       };
 
-      gameContainer.addEventListener('touchstart', touchstartHandler, { passive: false });
-      gameContainer.addEventListener('touchmove', touchmoveHandler, { passive: false });
-      gameContainer.addEventListener('touchend', touchendHandler, { passive: false });
+      gameContainer.addEventListener('touchstart', touchstartHandler, { signal, passive: false });
+      gameContainer.addEventListener('touchmove', touchmoveHandler, { signal, passive: false });
+      gameContainer.addEventListener('touchend', touchendHandler, { signal, passive: false });
 
-      this.handlers.push({ target: gameContainer, type: 'touchstart', fn: touchstartHandler });
-      this.handlers.push({ target: gameContainer, type: 'touchmove', fn: touchmoveHandler });
-      this.handlers.push({ target: gameContainer, type: 'touchend', fn: touchendHandler });
+      // Pointer events support for modern browsers
+      let pointerStartX = 0;
+      let pointerStartY = 0;
+      let isTrackingPointer = false;
+
+      const pointerdownHandler = (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (
+          (event.target.closest && event.target.closest('.game-message')) ||
+          (event.target.closest && event.target.closest('button, a'))
+        ) {
+          return;
+        }
+        isTrackingPointer = true;
+        pointerStartX = event.clientX;
+        pointerStartY = event.clientY;
+      };
+
+      const pointerupHandler = (event) => {
+        if (!isTrackingPointer) return;
+        isTrackingPointer = false;
+
+        const dx = event.clientX - pointerStartX;
+        const dy = event.clientY - pointerStartY;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+
+        if (Math.max(absDx, absDy) > 10) {
+          this.emit('move', absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+        }
+      };
+
+      const pointercancelHandler = () => {
+        isTrackingPointer = false;
+      };
+
+      gameContainer.addEventListener('pointerdown', pointerdownHandler, { signal });
+      gameContainer.addEventListener('pointerup', pointerupHandler, { signal });
+      gameContainer.addEventListener('pointercancel', pointercancelHandler, { signal });
     }
   }
 
@@ -170,16 +207,12 @@ export class KeyboardInputManager {
   bindButtonPress(selector, fn) {
     const buttons = document.querySelectorAll(selector);
     buttons.forEach((button) => {
-      button.addEventListener('click', fn);
-      this.handlers.push({ target: button, type: 'click', fn });
+      button.addEventListener('click', fn, { signal: this.controller.signal });
     });
   }
 
   destroy() {
-    this.handlers.forEach(({ target, type, fn }) => {
-      target.removeEventListener(type, fn);
-    });
-    this.handlers = [];
+    this.controller.abort();
     this.events = {};
   }
 }
